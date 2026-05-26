@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0; padding: 0; background-color: #121212; color: #e0e0e0;
+    }
+    .header {
+      background-color: #1a237e; color: white; padding: 16px; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 16px; }
+    .card {
+      background-color: #1e1e1e; border-radius: 8px; padding: 16px; margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 1px solid #303030;
+    }
+    .section-header {
+      background-color: #283593; color: white; padding: 10px;
+      margin: -16px -16px 16px -16px; border-radius: 8px 8px 0 0; font-weight: bold;
+    }
+    .button {
+      background-color: #3949ab; color: white; border: none; padding: 12px 16px;
+      border-radius: 4px; cursor: pointer; font-size: 16px; display: block;
+      width: 100%; margin-bottom: 8px; text-align: left; transition: background-color 0.2s;
+    }
+    .button:hover { background-color: #5c6bc0; }
+    .btn-icon { display: inline-block; margin-right: 10px; width: 24px; vertical-align: middle; }
+    .list { list-style: none; padding: 0; margin: 0; }
+    .list-item {
+      padding: 12px; border-bottom: 1px solid #303030; cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .list-item:hover { background-color: #282828; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .stats-label { font-weight: bold; text-align: right; color: #9fa8da; }
+    .stats-value { text-align: left; }
+    .rating-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-weight: bold; color: white;
+    }
+    .back-button {
+      background-color: #303f9f; color: white; border: none; padding: 8px 12px;
+      border-radius: 16px; cursor: pointer; margin-bottom: 16px;
+      display: inline-flex; align-items: center; transition: background-color 0.2s;
+    }
+    .back-button:hover { background-color: #3949ab; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    th {
+      text-align: left; padding: 8px; background-color: #2c2c2c;
+      border-bottom: 2px solid #3d3d3d; color: #9fa8da;
+    }
+    td { padding: 8px; border-bottom: 1px solid #333; vertical-align: top; }
+    tr:nth-child(even) { background-color: #252525; }
+    .loading { text-align: center; padding: 20px; color: #9e9e9e; }
+    .event-name { color: #bb86fc; font-style: italic; margin-top: 4px; display: block; }
+    .headliner-note { color: #03dac6; font-size: 0.9em; margin-top: 2px; display: block; }
+    .artist-role { color: #03dac6; font-size: 0.9em; font-style: italic; }
+    /* Drill-down styles */
+    .link {
+      color: #03dac6; cursor: pointer; text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .link:hover { color: #80cbc4; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background-color: #2a2a2a !important; }
+    /* Header home button */
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-inner h1 { margin: 0; flex: 1; text-align: center; }
+    .home-btn {
+      background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 12px; border-radius: 16px; cursor: pointer; font-size: 13px;
+      transition: background-color 0.2s; white-space: nowrap;
+    }
+    .home-btn:hover { background: rgba(255,255,255,0.25); }
+    .home-btn-placeholder { width: 70px; }
+    /* A-Z filter */
+    #az-filter {
+      display: flex; flex-wrap: wrap; gap: 3px; padding: 8px 0 12px;
+      position: sticky; top: 0; background: #1e1e1e; z-index: 10;
+    }
+    .az-btn {
+      background: #3949ab; color: white; border: none; padding: 4px 5px;
+      border-radius: 4px; cursor: pointer; font-size: 12px; min-width: 26px;
+      transition: background-color 0.2s;
+    }
+    .az-btn:hover { background: #5c6bc0; }
+    .az-btn:disabled { background: #2c2c2c; color: #555; cursor: default; }
+    .letter-anchor {
+      padding: 3px 12px; font-weight: bold; color: #9fa8da;
+      background: #252525; font-size: 0.8em; border-bottom: 1px solid #303030;
+      list-style: none;
+    }
+    /* Upcoming status badge */
+    .status-upcoming { background: #00796b; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
+    .status-announced { background: #e65100; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
+    .days-today { color: #FF9E80; font-weight: bold; }
+    .days-soon { color: #80DEEA; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-inner">
+      <button id="home-btn" class="home-btn" onclick="showHome()" style="visibility:hidden">⌂ Home</button>
+      <h1>Concert Tracker</h1>
+      <div class="home-btn-placeholder"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Home Screen -->
+    <div id="home-screen">
+      <div class="card">
+        <button class="button" onclick="showUpcoming()">
+          <span class="btn-icon">🎟️</span> Upcoming Concerts
+        </button>
+        <button class="button" onclick="showArtists()">
+          <span class="btn-icon">👤</span> Artist Breakdown
+        </button>
+        <button class="button" onclick="showAnalysis()">
+          <span class="btn-icon">📊</span> Concert Analysis
+        </button>
+        <button class="button" onclick="showVenues()">
+          <span class="btn-icon">🏟️</span> Venue Breakdown
+        </button>
+        <button class="button" onclick="showYears()">
+          <span class="btn-icon">📅</span> Yearly Breakdown
+        </button>
+      </div>
+    </div>
+
+    <!-- Artists Screen -->
+    <div id="artists-screen" style="display:none">
+      <button class="back-button" onclick="showHome()">← Back</button>
+      <div class="card">
+        <div class="section-header">SELECT AN ARTIST</div>
+        <div id="artists-content" class="loading">Loading artists...</div>
+      </div>
+    </div>
+
+    <!-- Venues Screen -->
+    <div id="venues-screen" style="display:none">
+      <button class="back-button" onclick="showHome()">← Back</button>
+      <div class="card">
+        <div class="section-header">SELECT A VENUE</div>
+        <div id="venues-content" class="loading">Loading venues...</div>
+      </div>
+    </div>
+
+    <!-- Analysis Screen -->
+    <div id="analysis-screen" style="display:none">
+      <button class="back-button" onclick="showHome()">← Back</button>
+      <div id="analysis-content" class="loading">Loading analysis...</div>
+    </div>
+
+    <!-- Years Screen -->
+    <div id="years-screen" style="display:none">
+      <button class="back-button" onclick="showHome()">← Back</button>
+      <div class="card">
+        <div class="section-header">SELECT A YEAR</div>
+        <div id="years-content" class="loading">Loading years...</div>
+      </div>
+    </div>
+
+    <!-- Upcoming Screen -->
+    <div id="upcoming-screen" style="display:none">
+      <button class="back-button" onclick="showHome()">← Back</button>
+      <div id="upcoming-content" class="loading">Loading upcoming concerts...</div>
+    </div>
+
+    <!-- Detail Screen — shared by artist, venue, event, companion, and year detail views -->
+    <div id="detail-screen" style="display:none">
+      <button class="back-button" onclick="goBack()">← Back</button>
+      <div id="detail-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // Replace with your deployed Apps Script web app URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUqxwchMlEfK9-pYPMBobSlxLlqHN8GBGmYdzJbemjVsfz89oTIu1a1Cl_TWCiYXak/exec';
+
+    function callApi(action, params = {}) {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', action);
+      Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+      return fetch(url).then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      });
+    }
+
+    // Stack-based navigation — supports arbitrary drill-down depth.
+    // Each entry stores the screen name, rendered HTML (for detail levels),
+    // and scroll position so the user returns to exactly where they were.
+    let navStack = [];
+    let currentScreen = 'home';
+
+    function showScreen(screenId) {
+      ['home', 'artists', 'venues', 'analysis', 'detail', 'years', 'upcoming'].forEach(s => {
+        document.getElementById(s + '-screen').style.display = 'none';
+      });
+      document.getElementById(screenId + '-screen').style.display = 'block';
+      currentScreen = screenId;
+      window.scrollTo(0, 0);
+      document.getElementById('home-btn').style.visibility = screenId === 'home' ? 'hidden' : 'visible';
+    }
+
+    // Navigate into a new detail view, preserving the current state on the stack.
+    function navigateToDetail(loadingHtml) {
+      navStack.push({
+        screen: currentScreen,
+        scroll: window.scrollY,
+        detailHtml: currentScreen === 'detail'
+          ? document.getElementById('detail-content').innerHTML
+          : null
+      });
+      document.getElementById('detail-content').innerHTML = loadingHtml;
+      showScreen('detail');
+    }
+
+    function showHome() {
+      navStack = [];
+      showScreen('home');
+    }
+
+    function goBack() {
+      if (navStack.length === 0) { showScreen('home'); return; }
+      const prev = navStack.pop();
+      if (prev.screen === 'detail' && prev.detailHtml) {
+        document.getElementById('detail-content').innerHTML = prev.detailHtml;
+        showScreen('detail');
+      } else {
+        showScreen(prev.screen);
+      }
+      setTimeout(() => window.scrollTo(0, prev.scroll), 50);
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      try {
+        return new Date(dateString).toLocaleDateString('en-AU', {
+          year: 'numeric', month: 'short', day: 'numeric'
+        });
+      } catch (e) { return dateString; }
+    }
+
+    function getRatingColor(rating) {
+      if (!rating || isNaN(rating)) return '#555';
+      rating = parseFloat(rating);
+      if (rating <= 1) return "#F44336";
+      if (rating <= 2) return "#F4655C";
+      if (rating <= 3) return "#F48771";
+      if (rating <= 4) return "#F4A987";
+      if (rating <= 5) return "#F4CA9E";
+      if (rating <= 6) return "#E6D576";
+      if (rating <= 7) return "#B5D86A";
+      if (rating <= 8) return "#7EC850";
+      if (rating <= 9) return "#5CB8C8";
+      return "#2196F3";
+    }
+
+    function ratingBadge(rating) {
+      if (!rating) return '-';
+      return `<span class="rating-badge" style="background-color:${getRatingColor(rating)}">${rating}</span>`;
+    }
+
+    // Escape a value for safe embedding in an onclick string attribute.
+    function esc(str) {
+      return (str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    function companionLinks(companions) {
+      return (companions || []).map(c =>
+        `<span class="link" onclick="event.stopPropagation();loadCompanionDetail('${esc(c)}')">${c}</span>`
+      ).join(', ');
+    }
+
+    // Renders a date as a clickable link to that year's breakdown.
+    function dateLink(dateStr) {
+      if (!dateStr) return '-';
+      const year = dateStr.substring(0, 4);
+      return `<span class="link" onclick="event.stopPropagation();loadYearDetail(${year})">${formatDate(dateStr)}</span>`;
+    }
+
+    function scrollToLetter(letter) {
+      const el = document.getElementById('az-' + letter);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function errHtml(msg) {
+      return `<div class="card"><div class="section-header">ERROR</div><div style="color:#ff6b6b;padding:10px;">${msg}</div></div>`;
+    }
+
+    // ── Top-level screens ─────────────────────────────────────────────────────
+
+    function sortKey(name) {
+      return name.startsWith('The ') ? name.slice(4) : name;
+    }
+
+    function showArtists() {
+      showScreen('artists');
+      document.getElementById('artists-content').innerHTML = '<div class="loading">Loading artists...</div>';
+      callApi('getArtists')
+        .then(data => {
+          if (!data.success || !data.artists) {
+            document.getElementById('artists-content').innerHTML = '<div style="padding:10px;text-align:center;">No artists found</div>';
+            return;
+          }
+
+          // Sort by key (ignoring leading "The ")
+          const artists = [...data.artists].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+
+          // Find which letters are present
+          const presentLetters = new Set(artists.map(a => sortKey(a)[0].toUpperCase()));
+
+          // Build A-Z filter bar
+          let azHtml = '<div id="az-filter">';
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l => {
+            azHtml += presentLetters.has(l)
+              ? `<button class="az-btn" onclick="scrollToLetter('${l}')">${l}</button>`
+              : `<button class="az-btn" disabled>${l}</button>`;
+          });
+          azHtml += '</div>';
+
+          // Build list with letter anchors at each group boundary
+          let listHtml = '<ul class="list">';
+          let prevLetter = null;
+          artists.forEach(a => {
+            const letter = sortKey(a)[0].toUpperCase();
+            if (letter !== prevLetter) {
+              listHtml += `<li id="az-${letter}" class="letter-anchor">${letter}</li>`;
+              prevLetter = letter;
+            }
+            listHtml += `<li class="list-item" onclick="loadArtistDetail('${esc(a)}')">${a}</li>`;
+          });
+          listHtml += '</ul>';
+
+          document.getElementById('artists-content').innerHTML = azHtml + listHtml;
+        })
+        .catch(e => {
+          document.getElementById('artists-content').innerHTML = `<div style="color:#ff6b6b;padding:10px;">Error: ${e}</div>`;
+        });
+    }
+
+    function showVenues() {
+      showScreen('venues');
+      document.getElementById('venues-content').innerHTML = '<div class="loading">Loading venues...</div>';
+      callApi('getVenues')
+        .then(data => {
+          if (!data.success || !data.venues) {
+            document.getElementById('venues-content').innerHTML = '<div style="padding:10px;text-align:center;">No venues found</div>';
+            return;
+          }
+          let html = '<ul class="list">';
+          data.venues.forEach(v => {
+            html += `<li class="list-item" onclick="loadVenueDetail('${esc(v)}')">${v}</li>`;
+          });
+          document.getElementById('venues-content').innerHTML = html + '</ul>';
+        })
+        .catch(e => {
+          document.getElementById('venues-content').innerHTML = `<div style="color:#ff6b6b;padding:10px;">Error: ${e}</div>`;
+        });
+    }
+
+    function showAnalysis() {
+      showScreen('analysis');
+      document.getElementById('analysis-content').innerHTML = '<div class="loading">Loading analysis...</div>';
+      callApi('getAnalysis')
+        .then(data => {
+          if (!data.success) {
+            document.getElementById('analysis-content').innerHTML = errHtml('Error loading analysis');
+            return;
+          }
+          const { summary, topArtists, topVenues, topCities, eventsYearData, artistYearData, topCompanions } = data;
+
+          let html = `<div class="card">
+            <div class="section-header">SUMMARY STATISTICS</div>
+            <div class="stats-grid">
+              <div class="stats-label">Total Events:</div><div class="stats-value">${summary.totalEvents}</div>
+              <div class="stats-label">Total Artists:</div><div class="stats-value">${summary.totalArtists}</div>
+              <div class="stats-label">Unique Artists:</div><div class="stats-value">${summary.uniqueArtists}</div>
+              <div class="stats-label">Unique Venues:</div><div class="stats-value">${summary.uniqueVenues}</div>
+              <div class="stats-label">Unique Cities:</div><div class="stats-value">${summary.uniqueCities}</div>
+              <div class="stats-label">Avg Headliner Rating:</div>
+              <div class="stats-value">${ratingBadge(summary.avgRating)}</div>
+            </div>
+          </div>`;
+
+          if (topArtists && topArtists.length > 0) {
+            html += '<div class="card"><div class="section-header">MOST SEEN ARTISTS</div><table><thead><tr><th>Artist</th><th>Times Seen</th></tr></thead><tbody>';
+            topArtists.forEach(a => {
+              html += `<tr class="clickable" onclick="loadArtistDetail('${esc(a.name)}')">
+                <td><span class="link">${a.name}</span></td><td>${a.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (topVenues && topVenues.length > 0) {
+            html += '<div class="card"><div class="section-header">MOST VISITED VENUES</div><table><thead><tr><th>Venue</th><th>Events</th></tr></thead><tbody>';
+            topVenues.forEach(v => {
+              html += `<tr class="clickable" onclick="loadVenueDetail('${esc(v.name)}')">
+                <td><span class="link">${v.name}</span></td><td>${v.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (topCities && topCities.length > 0) {
+            html += '<div class="card"><div class="section-header">MOST VISITED CITIES</div><table><thead><tr><th>City</th><th>Events</th></tr></thead><tbody>';
+            topCities.forEach(c => {
+              html += `<tr><td>${c.name}</td><td>${c.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (eventsYearData && eventsYearData.length > 0) {
+            html += '<div class="card"><div class="section-header">EVENTS BY YEAR</div><table><thead><tr><th>Year</th><th>Events</th></tr></thead><tbody>';
+            eventsYearData.forEach(y => { html += `<tr><td>${y.year}</td><td>${y.count}</td></tr>`; });
+            html += '</tbody></table></div>';
+          }
+
+          if (artistYearData && artistYearData.length > 0) {
+            html += '<div class="card"><div class="section-header">UNIQUE ARTISTS BY YEAR</div><table><thead><tr><th>Year</th><th>Unique Artists</th></tr></thead><tbody>';
+            artistYearData.forEach(y => { html += `<tr><td>${y.year}</td><td>${y.count}</td></tr>`; });
+            html += '</tbody></table></div>';
+          }
+
+          if (topCompanions && topCompanions.length > 0) {
+            html += '<div class="card"><div class="section-header">CONCERT COMPANIONS</div><table><thead><tr><th>Companion</th><th>Times</th></tr></thead><tbody>';
+            topCompanions.forEach(c => {
+              html += `<tr class="clickable" onclick="loadCompanionDetail('${esc(c.name)}')">
+                <td><span class="link">${c.name}</span></td><td>${c.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Generated: ${new Date().toLocaleString()}</div>`;
+          document.getElementById('analysis-content').innerHTML = html;
+        })
+        .catch(e => {
+          document.getElementById('analysis-content').innerHTML = errHtml(e);
+        });
+    }
+
+    // ── Detail views ──────────────────────────────────────────────────────────
+
+    function loadArtistDetail(artist) {
+      navigateToDetail(`<div class="card"><div class="section-header">ARTIST: ${artist}</div><div class="loading">Loading data...</div></div>`);
+
+      callApi('getArtistData', { artist })
+        .then(data => {
+          if (!data.success || !data.concerts) {
+            document.getElementById('detail-content').innerHTML = errHtml('No data found');
+            return;
+          }
+
+          const concerts = data.concerts.sort((a, b) => new Date(a.date) - new Date(b.date));
+          const first = concerts[0];
+          const last = concerts[concerts.length - 1];
+
+          const uniqueVenues = [...new Set(concerts.map(c => c.venue))];
+          const uniqueCities = [...new Set(concerts.map(c => c.city))];
+          const ratings = concerts.map(c => parseFloat(c.rating)).filter(r => !isNaN(r));
+          const avgRating = ratings.length > 0
+            ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+            : 'N/A';
+
+          let timeSpan = 'N/A';
+          try {
+            const diffDays = Math.ceil(Math.abs(new Date(last.date) - new Date(first.date)) / 86400000);
+            if (diffDays === 0) timeSpan = 'Same day';
+            else if (diffDays < 30) timeSpan = `${diffDays} day${diffDays === 1 ? '' : 's'}`;
+            else if (diffDays < 365) { const m = Math.round(diffDays / 30); timeSpan = `${m} month${m === 1 ? '' : 's'}`; }
+            else { const y = (diffDays / 365).toFixed(1); timeSpan = `${y} year${y === '1.0' ? '' : 's'}`; }
+          } catch (e) {}
+
+          const venueCounts = {}, cityCounts = {}, companionCounts = {};
+          concerts.forEach(c => {
+            venueCounts[c.venue] = (venueCounts[c.venue] || 0) + 1;
+            cityCounts[c.city] = (cityCounts[c.city] || 0) + 1;
+            c.companions.forEach(p => { companionCounts[p] = (companionCounts[p] || 0) + 1; });
+          });
+          const sortedVenues = Object.entries(venueCounts).sort((a, b) => b[1] - a[1]);
+          const sortedCities = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]);
+          const sortedCompanions = Object.entries(companionCounts).sort((a, b) => b[1] - a[1]);
+
+          let html = `<div class="card">
+            <div class="section-header">ARTIST: ${artist}</div>
+            <div class="stats-grid">
+              <div class="stats-label">Times Seen:</div><div class="stats-value">${concerts.length}</div>
+              <div class="stats-label">First Show:</div><div class="stats-value">${formatDate(first.date)}</div>
+              <div class="stats-label">Last Show:</div><div class="stats-value">${formatDate(last.date)}</div>
+              <div class="stats-label">Time Span:</div><div class="stats-value">${timeSpan}</div>
+              <div class="stats-label">Unique Venues:</div><div class="stats-value">${uniqueVenues.length}</div>
+              <div class="stats-label">Unique Cities:</div><div class="stats-value">${uniqueCities.length}</div>
+              <div class="stats-label">Average Rating:</div>
+              <div class="stats-value">${ratingBadge(avgRating)}</div>
+            </div>
+          </div>`;
+
+          // Show history — row → event detail, venue name → venue detail
+          html += '<div class="card"><div class="section-header">SHOW HISTORY</div><table><thead><tr><th>Date</th><th>Venue &amp; Event</th><th>City</th><th>Rating</th></tr></thead><tbody>';
+          concerts.forEach(c => {
+            let venueCell = `<span class="link" onclick="event.stopPropagation();loadVenueDetail('${esc(c.venue)}')">${c.venue}</span>`;
+            if (c.eventName && c.eventName.trim()) venueCell += `<span class="event-name">${c.eventName}</span>`;
+            if (c.role && c.role.toLowerCase().includes('support') && c.headliner) {
+              venueCell += `<span class="headliner-note">Supporting: ${c.headliner}</span>`;
+            }
+            html += `<tr class="clickable" onclick="loadEventDetail('${c.date}','${esc(c.venue)}')">
+              <td>${dateLink(c.date)}</td>
+              <td>${venueCell}</td>
+              <td>${c.city}</td>
+              <td>${ratingBadge(c.rating)}</td>
+            </tr>`;
+          });
+          html += '</tbody></table></div>';
+
+          // Venues — each row → venue detail
+          if (sortedVenues.length > 0) {
+            html += '<div class="card"><div class="section-header">VENUES</div><table><thead><tr><th>Venue</th><th>Times</th></tr></thead><tbody>';
+            sortedVenues.forEach(([name, count]) => {
+              html += `<tr class="clickable" onclick="loadVenueDetail('${esc(name)}')">
+                <td><span class="link">${name}</span></td><td>${count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (sortedCities.length > 0) {
+            html += '<div class="card"><div class="section-header">CITIES</div><table><thead><tr><th>City</th><th>Times</th></tr></thead><tbody>';
+            sortedCities.forEach(([name, count]) => { html += `<tr><td>${name}</td><td>${count}</td></tr>`; });
+            html += '</tbody></table></div>';
+          }
+
+          if (sortedCompanions.length > 0) {
+            html += '<div class="card"><div class="section-header">CONCERT COMPANIONS</div><table><thead><tr><th>Companion</th><th>Times</th></tr></thead><tbody>';
+            sortedCompanions.forEach(([name, count]) => {
+              html += `<tr class="clickable" onclick="loadCompanionDetail('${esc(name)}')">
+                <td><span class="link">${name}</span></td><td>${count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Generated: ${new Date().toLocaleString()}</div>`;
+          document.getElementById('detail-content').innerHTML = html;
+        })
+        .catch(e => {
+          document.getElementById('detail-content').innerHTML = errHtml(e);
+        });
+    }
+
+    function loadVenueDetail(venue) {
+      navigateToDetail(`<div class="card"><div class="section-header">VENUE: ${venue}</div><div class="loading">Loading data...</div></div>`);
+
+      callApi('getVenueData', { venue })
+        .then(data => {
+          if (!data.success) {
+            document.getElementById('detail-content').innerHTML = errHtml('No data found');
+            return;
+          }
+          const { summary, events, topArtists, topCompanions } = data;
+
+          let html = `<div class="card">
+            <div class="section-header">VENUE: ${venue}</div>
+            <div class="stats-grid">
+              <div class="stats-label">Total Events:</div><div class="stats-value">${summary.totalEvents}</div>
+              <div class="stats-label">Total Artists:</div><div class="stats-value">${summary.totalArtists}</div>
+              <div class="stats-label">Unique Artists:</div><div class="stats-value">${summary.uniqueArtists}</div>
+              <div class="stats-label">City:</div><div class="stats-value">${summary.city}</div>
+              <div class="stats-label">First Visit:</div><div class="stats-value">${formatDate(summary.firstVisit)}</div>
+              <div class="stats-label">Latest Visit:</div><div class="stats-value">${formatDate(summary.lastVisit)}</div>
+              <div class="stats-label">Time Span:</div><div class="stats-value">${summary.timeSpan}</div>
+              <div class="stats-label">Average Rating:</div>
+              <div class="stats-value">${ratingBadge(summary.avgRating)}</div>
+            </div>
+          </div>`;
+
+          // Event history — row → event detail, artist names → artist detail
+          if (events && events.length > 0) {
+            html += '<div class="card"><div class="section-header">EVENT HISTORY</div><table><thead><tr><th>Date</th><th>Artists &amp; Event</th><th>Companions</th><th>Rating</th></tr></thead><tbody>';
+            events.forEach(ev => {
+              const headliners = [], supportActs = [], otherActs = [];
+              (ev.artists || []).forEach(a => {
+                const r = (a.role || '').toLowerCase();
+                const nameLink = `<span class="link" onclick="event.stopPropagation();loadArtistDetail('${esc(a.name)}')">${a.name}</span>`;
+                if (r.includes('headline') || r.includes('headliner')) {
+                  headliners.push(nameLink);
+                } else if (r.includes('support') || r.includes('opening')) {
+                  supportActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`);
+                } else {
+                  a.role ? otherActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`) : headliners.push(nameLink);
+                }
+              });
+
+              let display = headliners.join(' &amp; ');
+              if (otherActs.length) display += (display ? '<br>' : '') + otherActs.join('<br>');
+              if (ev.eventName && ev.eventName.trim()) display += `${display ? '<br>' : ''}<span class="event-name">${ev.eventName}</span>`;
+              if (supportActs.length) display += (display ? '<br>' : '') + supportActs.join('<br>');
+              if (!display) display = (ev.artists || []).map(a => a.name).join(', ');
+
+              html += `<tr class="clickable" onclick="loadEventDetail('${ev.date}','${esc(venue)}')">
+                <td>${dateLink(ev.date)}</td>
+                <td>${display}</td>
+                <td>${companionLinks(ev.companions)}</td>
+                <td>${ratingBadge(ev.rating)}</td>
+              </tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          // Top artists — each row → artist detail
+          if (topArtists && topArtists.length > 0) {
+            html += '<div class="card"><div class="section-header">TOP ARTISTS AT THIS VENUE</div><table><thead><tr><th>Artist</th><th>Times Performed</th></tr></thead><tbody>';
+            topArtists.forEach(a => {
+              html += `<tr class="clickable" onclick="loadArtistDetail('${esc(a.name)}')">
+                <td><span class="link">${a.name}</span></td><td>${a.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (topCompanions && topCompanions.length > 0) {
+            html += '<div class="card"><div class="section-header">CONCERT COMPANIONS</div><table><thead><tr><th>Companion</th><th>Times</th></tr></thead><tbody>';
+            topCompanions.forEach(c => {
+              html += `<tr class="clickable" onclick="loadCompanionDetail('${esc(c.name)}')">
+                <td><span class="link">${c.name}</span></td><td>${c.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Generated: ${new Date().toLocaleString()}</div>`;
+          document.getElementById('detail-content').innerHTML = html;
+        })
+        .catch(e => {
+          document.getElementById('detail-content').innerHTML = errHtml(e);
+        });
+    }
+
+    function loadEventDetail(dateStr, venue) {
+      navigateToDetail(`<div class="card"><div class="section-header">EVENT DETAIL</div><div class="loading">Loading data...</div></div>`);
+
+      callApi('getEventData', { date: dateStr, venue })
+        .then(data => {
+          if (!data.success) {
+            document.getElementById('detail-content').innerHTML = errHtml(data.error || 'Event not found');
+            return;
+          }
+
+          let html = `<div class="card">
+            <div class="section-header">EVENT DETAIL</div>
+            <div class="stats-grid">
+              <div class="stats-label">Date:</div><div class="stats-value">${dateLink(data.date)}</div>
+              <div class="stats-label">Venue:</div>
+              <div class="stats-value"><span class="link" onclick="loadVenueDetail('${esc(data.venue)}')">${data.venue}</span></div>
+              <div class="stats-label">City:</div><div class="stats-value">${data.city}</div>`;
+          if (data.eventName) {
+            html += `<div class="stats-label">Event:</div><div class="stats-value" style="color:#bb86fc;font-style:italic;">${data.eventName}</div>`;
+          }
+          if (data.companions && data.companions.length > 0) {
+            const companionLinks = data.companions.map(c =>
+              `<span class="link" onclick="loadCompanionDetail('${esc(c)}')">${c}</span>`
+            ).join(', ');
+            html += `<div class="stats-label">With:</div><div class="stats-value">${companionLinks}</div>`;
+          }
+          html += `</div></div>`;
+
+          // Artists — each row → artist detail
+          if (data.artists && data.artists.length > 0) {
+            const hasNotes = data.artists.some(a => a.notes && a.notes.trim());
+            const notesTh = hasNotes ? '<th>Notes</th>' : '';
+            html += `<div class="card"><div class="section-header">ARTISTS</div><table><thead><tr><th>Artist</th><th>Role</th><th>Rating</th>${notesTh}</tr></thead><tbody>`;
+            data.artists.forEach(a => {
+              const notesTd = hasNotes ? `<td style="color:#9e9e9e;font-size:0.9em;">${a.notes || ''}</td>` : '';
+              html += `<tr class="clickable" onclick="loadArtistDetail('${esc(a.name)}')">
+                <td><span class="link">${a.name}</span></td>
+                <td><span class="artist-role">${a.role || '-'}</span></td>
+                <td>${ratingBadge(a.rating)}</td>
+                ${notesTd}
+              </tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Generated: ${new Date().toLocaleString()}</div>`;
+          document.getElementById('detail-content').innerHTML = html;
+        })
+        .catch(e => {
+          document.getElementById('detail-content').innerHTML = errHtml(e);
+        });
+    }
+
+    function showYears() {
+      showScreen('years');
+      document.getElementById('years-content').innerHTML = '<div class="loading">Loading years...</div>';
+      callApi('getYears')
+        .then(data => {
+          if (!data.success || !data.years.length) {
+            document.getElementById('years-content').innerHTML = '<div style="padding:10px;text-align:center;">No data found</div>';
+            return;
+          }
+          let html = '<ul class="list">';
+          data.years.forEach(y => {
+            html += `<li class="list-item" onclick="loadYearDetail(${y.year})">
+              <strong>${y.year}</strong>
+              <span style="color:#9fa8da;float:right">${y.count} artist appearance${y.count === 1 ? '' : 's'}</span>
+            </li>`;
+          });
+          document.getElementById('years-content').innerHTML = html + '</ul>';
+        })
+        .catch(e => {
+          document.getElementById('years-content').innerHTML = `<div style="color:#ff6b6b;padding:10px;">Error: ${e}</div>`;
+        });
+    }
+
+    function loadYearDetail(year) {
+      navigateToDetail(`<div class="card"><div class="section-header">YEAR: ${year}</div><div class="loading">Loading data...</div></div>`);
+      callApi('getYearData', { year })
+        .then(data => {
+          if (!data.success) {
+            document.getElementById('detail-content').innerHTML = errHtml(data.error || 'No data found');
+            return;
+          }
+          const { summary, events, topArtists, topVenues } = data;
+
+          let html = `<div class="card">
+            <div class="section-header">YEAR: ${year}</div>
+            <div class="stats-grid">
+              <div class="stats-label">Total Events:</div><div class="stats-value">${summary.totalEvents}</div>
+              <div class="stats-label">Total Artists:</div><div class="stats-value">${summary.totalArtists}</div>
+              <div class="stats-label">Unique Artists:</div><div class="stats-value">${summary.uniqueArtists}</div>
+              <div class="stats-label">Unique Venues:</div><div class="stats-value">${summary.uniqueVenues}</div>
+              <div class="stats-label">Avg Rating:</div>
+              <div class="stats-value">${ratingBadge(summary.avgRating)}</div>
+            </div>
+          </div>`;
+
+          if (events && events.length > 0) {
+            html += '<div class="card"><div class="section-header">ALL EVENTS</div><table><thead><tr><th>Date</th><th>Venue &amp; Artists</th><th>Companions</th><th>Rating</th></tr></thead><tbody>';
+            events.forEach(ev => {
+              const venueLink = `<span class="link" onclick="event.stopPropagation();loadVenueDetail('${esc(ev.venue)}')">${ev.venue}</span>`;
+              const headliners = [], supportActs = [], otherActs = [];
+              (ev.artists || []).forEach(a => {
+                const r = (a.role || '').toLowerCase();
+                const nameLink = `<span class="link" onclick="event.stopPropagation();loadArtistDetail('${esc(a.name)}')">${a.name}</span>`;
+                if (r.includes('headline') || r.includes('headliner')) headliners.push(nameLink);
+                else if (r.includes('support') || r.includes('opening')) supportActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`);
+                else a.role ? otherActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`) : headliners.push(nameLink);
+              });
+              let artistDisplay = headliners.join(' &amp; ');
+              if (otherActs.length) artistDisplay += (artistDisplay ? '<br>' : '') + otherActs.join('<br>');
+              if (ev.eventName && ev.eventName.trim()) artistDisplay += `${artistDisplay ? '<br>' : ''}<span class="event-name">${ev.eventName}</span>`;
+              if (supportActs.length) artistDisplay += (artistDisplay ? '<br>' : '') + supportActs.join('<br>');
+              let cell = venueLink;
+              if (artistDisplay) cell += '<br>' + artistDisplay;
+              html += `<tr class="clickable" onclick="loadEventDetail('${ev.date}','${esc(ev.venue)}')">
+                <td>${formatDate(ev.date)}</td>
+                <td>${cell}</td>
+                <td>${companionLinks(ev.companions)}</td>
+                <td>${ratingBadge(ev.rating)}</td>
+              </tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (topArtists && topArtists.length > 0) {
+            html += '<div class="card"><div class="section-header">TOP ARTISTS</div><table><thead><tr><th>Artist</th><th>Times Seen</th></tr></thead><tbody>';
+            topArtists.forEach(a => {
+              html += `<tr class="clickable" onclick="loadArtistDetail('${esc(a.name)}')"><td><span class="link">${a.name}</span></td><td>${a.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          if (topVenues && topVenues.length > 0) {
+            html += '<div class="card"><div class="section-header">TOP VENUES</div><table><thead><tr><th>Venue</th><th>Events</th></tr></thead><tbody>';
+            topVenues.forEach(v => {
+              html += `<tr class="clickable" onclick="loadVenueDetail('${esc(v.name)}')"><td><span class="link">${v.name}</span></td><td>${v.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Generated: ${new Date().toLocaleString()}</div>`;
+          document.getElementById('detail-content').innerHTML = html;
+        })
+        .catch(e => {
+          document.getElementById('detail-content').innerHTML = errHtml(e);
+        });
+    }
+
+    let allUpcomingShows = [];
+    let showingAnnounced = false;
+
+    function renderUpcoming() {
+      const shows = showingAnnounced
+        ? allUpcomingShows
+        : allUpcomingShows.filter(s => s.status === 'Upcoming');
+
+      const upcomingCount = allUpcomingShows.filter(s => s.status === 'Upcoming').length;
+      const announcedCount = allUpcomingShows.filter(s => s.status === 'Announced').length;
+
+      const toggleLabel = showingAnnounced ? 'Hide Announced' : `Show Announced (${announcedCount})`;
+      const toggleStyle = showingAnnounced ? 'background:#37474f' : 'background:#3949ab';
+
+      let html = `<div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:12px;flex-wrap:wrap;gap:8px;">
+        <span><strong>${upcomingCount}</strong> upcoming${showingAnnounced && announcedCount ? ` &nbsp;·&nbsp; <strong>${announcedCount}</strong> announced` : ''}</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${showingAnnounced && announcedCount ? `<span style="font-size:12px;color:#9e9e9e;">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#00796b;margin-right:4px;vertical-align:middle;"></span>Upcoming
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e65100;margin-left:8px;margin-right:4px;vertical-align:middle;"></span>Announced
+          </span>` : ''}
+          ${announcedCount > 0 ? `<button onclick="toggleAnnounced()" style="${toggleStyle};color:white;border:none;padding:6px 12px;border-radius:16px;cursor:pointer;font-size:13px;">${toggleLabel}</button>` : ''}
+        </div>
+      </div>`;
+
+      if (!shows.length) {
+        html += '<div class="card" style="text-align:center;padding:20px;">No upcoming shows found.</div>';
+        document.getElementById('upcoming-content').innerHTML = html;
+        return;
+      }
+
+      // Group by month
+      const byMonth = {};
+      shows.forEach(s => {
+        const d = new Date(s.date);
+        const key = d.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+        if (!byMonth[key]) byMonth[key] = [];
+        byMonth[key].push(s);
+      });
+
+      Object.entries(byMonth).forEach(([month, monthShows]) => {
+        html += `<div class="card">
+          <div class="section-header">${month}</div>
+          <div style="overflow-x:auto;">
+          <table><thead><tr><th>Days</th><th>Date</th><th>Artist &amp; Event</th><th>Venue</th></tr></thead><tbody>`;
+
+        monthShows.forEach(s => {
+          let daysHtml;
+          if (s.daysUntil === 0)      daysHtml = `<span class="days-today">TODAY!</span>`;
+          else if (s.daysUntil === 1) daysHtml = `<span class="days-soon">TMR!</span>`;
+          else if (s.daysUntil <= 7) daysHtml = `<span class="days-soon">${s.daysUntil}d</span>`;
+          else                        daysHtml = `${s.daysUntil}d`;
+
+          const artistCell = `<span class="link" onclick="loadArtistDetail('${esc(s.artist)}')">${s.artist}</span>`
+            + (s.eventName ? `<span class="event-name">${s.eventName}</span>` : '');
+          const venueCell = `<span class="link" onclick="loadVenueDetail('${esc(s.venue)}')">${s.venue}</span>`;
+
+          const rowBg = showingAnnounced
+            ? (s.status === 'Upcoming' ? 'background:rgba(0,121,107,0.15)' : 'background:rgba(230,81,0,0.15)')
+            : '';
+
+          html += `<tr style="${rowBg}">
+            <td style="white-space:nowrap">${daysHtml}</td>
+            <td style="white-space:nowrap">${formatDate(s.date)}</td>
+            <td>${artistCell}</td>
+            <td>${venueCell}</td>
+          </tr>`;
+        });
+
+        html += '</tbody></table></div></div>';
+      });
+
+      html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Updated: ${new Date().toLocaleString()}</div>`;
+      document.getElementById('upcoming-content').innerHTML = html;
+    }
+
+    function toggleAnnounced() {
+      showingAnnounced = !showingAnnounced;
+      renderUpcoming();
+    }
+
+    function showUpcoming() {
+      showScreen('upcoming');
+      showingAnnounced = false;
+      document.getElementById('upcoming-content').innerHTML = '<div class="loading">Loading upcoming concerts...</div>';
+      callApi('getUpcomingShows')
+        .then(data => {
+          if (!data.success) {
+            document.getElementById('upcoming-content').innerHTML = errHtml('Error loading shows');
+            return;
+          }
+          allUpcomingShows = data.shows;
+          renderUpcoming();
+        })
+        .catch(e => {
+          document.getElementById('upcoming-content').innerHTML = errHtml(e);
+        });
+    }
+
+    function loadCompanionDetail(companion) {
+      navigateToDetail(`<div class="card"><div class="section-header">COMPANION: ${companion}</div><div class="loading">Loading data...</div></div>`);
+
+      callApi('getCompanionData', { companion })
+        .then(data => {
+          if (!data.success) {
+            document.getElementById('detail-content').innerHTML = errHtml(data.error || 'No data found');
+            return;
+          }
+
+          const { summary, events, topArtists, topVenues } = data;
+
+          let html = `<div class="card">
+            <div class="section-header">COMPANION: ${companion}</div>
+            <div class="stats-grid">
+              <div class="stats-label">Shows Together:</div><div class="stats-value">${summary.totalEvents}</div>
+              <div class="stats-label">Total Artists:</div><div class="stats-value">${summary.totalArtists}</div>
+              <div class="stats-label">Unique Artists:</div><div class="stats-value">${summary.uniqueArtists}</div>
+              <div class="stats-label">First Show:</div><div class="stats-value">${dateLink(summary.firstEvent)}</div>
+              <div class="stats-label">Last Show:</div><div class="stats-value">${dateLink(summary.lastEvent)}</div>
+              <div class="stats-label">Time Span:</div><div class="stats-value">${summary.timeSpan}</div>
+            </div>
+          </div>`;
+
+          // Events attended together — row → event detail, venue → venue detail, artists → artist detail
+          if (events && events.length > 0) {
+            html += '<div class="card"><div class="section-header">SHOWS TOGETHER</div><table><thead><tr><th>Date</th><th>Venue &amp; Artists</th><th>Rating</th></tr></thead><tbody>';
+            events.forEach(ev => {
+              const venueLink = `<span class="link" onclick="event.stopPropagation();loadVenueDetail('${esc(ev.venue)}')">${ev.venue}</span>`;
+
+              const headliners = [], supportActs = [], otherActs = [];
+              (ev.artists || []).forEach(a => {
+                const r = (a.role || '').toLowerCase();
+                const nameLink = `<span class="link" onclick="event.stopPropagation();loadArtistDetail('${esc(a.name)}')">${a.name}</span>`;
+                if (r.includes('headline') || r.includes('headliner')) headliners.push(nameLink);
+                else if (r.includes('support') || r.includes('opening')) supportActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`);
+                else a.role ? otherActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`) : headliners.push(nameLink);
+              });
+
+              let artistDisplay = headliners.join(' &amp; ');
+              if (otherActs.length) artistDisplay += (artistDisplay ? '<br>' : '') + otherActs.join('<br>');
+              if (ev.eventName && ev.eventName.trim()) artistDisplay += `${artistDisplay ? '<br>' : ''}<span class="event-name">${ev.eventName}</span>`;
+              if (supportActs.length) artistDisplay += (artistDisplay ? '<br>' : '') + supportActs.join('<br>');
+
+              let cell = venueLink;
+              if (artistDisplay) cell += '<br>' + artistDisplay;
+
+              html += `<tr class="clickable" onclick="loadEventDetail('${ev.date}','${esc(ev.venue)}')">
+                <td>${dateLink(ev.date)}</td>
+                <td>${cell}</td>
+                <td>${ratingBadge(ev.rating)}</td>
+              </tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          // Top artists seen together — clickable
+          if (topArtists && topArtists.length > 0) {
+            html += '<div class="card"><div class="section-header">TOP ARTISTS SEEN TOGETHER</div><table><thead><tr><th>Artist</th><th>Times</th></tr></thead><tbody>';
+            topArtists.forEach(a => {
+              html += `<tr class="clickable" onclick="loadArtistDetail('${esc(a.name)}')">
+                <td><span class="link">${a.name}</span></td><td>${a.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          // Top venues visited together — clickable
+          if (topVenues && topVenues.length > 0) {
+            html += '<div class="card"><div class="section-header">TOP VENUES VISITED TOGETHER</div><table><thead><tr><th>Venue</th><th>Times</th></tr></thead><tbody>';
+            topVenues.forEach(v => {
+              html += `<tr class="clickable" onclick="loadVenueDetail('${esc(v.name)}')">
+                <td><span class="link">${v.name}</span></td><td>${v.count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+          }
+
+          html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Generated: ${new Date().toLocaleString()}</div>`;
+          document.getElementById('detail-content').innerHTML = html;
+        })
+        .catch(e => {
+          document.getElementById('detail-content').innerHTML = errHtml(e);
+        });
+    }
+  </script>
+</body>
+</html>
