@@ -984,6 +984,16 @@
           document.getElementById('detail-content').innerHTML = errHtml(e);
         });
     }
+
+    // Pre-warm the cache: fire all list calls in parallel on page load.
+    // Results land in sessionStorage so the first user interaction is instant.
+    Promise.allSettled([
+      callApi('getArtists'),
+      callApi('getVenues'),
+      callApi('getAnalysis'),
+      callApi('getYears'),
+      callApi('getUpcomingShows')
+    ]);
   </script>
 </body>
 </html>
