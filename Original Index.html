@@ -1,169 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0f1117;
-      --bg-elevated: #171a21;
-      --bg-card: #1b1e27;
-      --border: #2a2e3a;
-      --text: #e8e9ed;
-      --text-muted: #9099ab;
-      --accent: #5c6bc0;
-      --accent-strong: #8b98f0;
-      --accent-soft: rgba(92,107,192,0.16);
-      --teal: #03dac6;
-      --teal-soft: rgba(3,218,198,0.14);
-      --radius: 14px;
-      --radius-sm: 9px;
-      --shadow: 0 8px 24px rgba(0,0,0,0.35);
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.28);
-    }
-    * { box-sizing: border-box; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      margin: 0; padding: 0; background-color: var(--bg); color: var(--text);
-      -webkit-font-smoothing: antialiased;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0; padding: 0; background-color: #121212; color: #e0e0e0;
     }
     .header {
-      background: linear-gradient(135deg, #171a3a 0%, #262f7a 55%, #37419c 100%);
-      color: white; padding: 20px 16px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.45);
-      border-bottom: 1px solid rgba(139,152,240,0.25);
+      background-color: #1a237e; color: white; padding: 16px; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
-    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .container { max-width: 800px; margin: 0 auto; padding: 16px; }
     .card {
-      background-color: var(--bg-card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
-      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+      background-color: #1e1e1e; border-radius: 8px; padding: 16px; margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 1px solid #303030;
     }
     .section-header {
-      color: var(--accent-strong); padding-bottom: 10px; margin: 0 0 16px 0;
-      font-weight: 700; font-size: 12.5px; letter-spacing: 0.09em; text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
+      background-color: #283593; color: white; padding: 10px;
+      margin: -16px -16px 16px -16px; border-radius: 8px 8px 0 0; font-weight: bold;
     }
+    .button {
+      background-color: #3949ab; color: white; border: none; padding: 12px 16px;
+      border-radius: 4px; cursor: pointer; font-size: 16px; display: block;
+      width: 100%; margin-bottom: 8px; text-align: left; transition: background-color 0.2s;
+    }
+    .button:hover { background-color: #5c6bc0; }
     .btn-icon { display: inline-block; margin-right: 10px; width: 24px; vertical-align: middle; }
     .list { list-style: none; padding: 0; margin: 0; }
     .list-item {
-      padding: 13px 6px; border-bottom: 1px solid var(--border); cursor: pointer;
-      transition: background-color 0.15s ease, padding-left 0.15s ease; border-radius: var(--radius-sm);
+      padding: 12px; border-bottom: 1px solid #303030; cursor: pointer;
+      transition: background-color 0.2s;
     }
-    .list-item:hover { background-color: var(--bg-elevated); padding-left: 12px; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; margin-bottom: 4px; }
-    .stats-label { font-weight: 600; text-align: right; color: var(--text-muted); font-size: 13.5px; }
+    .list-item:hover { background-color: #282828; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .stats-label { font-weight: bold; text-align: right; color: #9fa8da; }
     .stats-value { text-align: left; }
     .rating-badge {
-      display: inline-block; padding: 2px 9px; border-radius: 20px;
-      font-weight: 700; color: #0f1117; font-size: 13px;
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-weight: bold; color: white;
     }
     .back-button {
-      background-color: var(--bg-card); color: var(--text); border: 1px solid var(--border); padding: 8px 14px;
-      border-radius: 20px; cursor: pointer; margin-bottom: 16px;
-      display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600;
-      transition: background-color 0.15s ease, border-color 0.15s ease;
+      background-color: #303f9f; color: white; border: none; padding: 8px 12px;
+      border-radius: 16px; cursor: pointer; margin-bottom: 16px;
+      display: inline-flex; align-items: center; transition: background-color 0.2s;
     }
-    .back-button:hover { background-color: var(--bg-elevated); border-color: var(--accent); }
-    .breadcrumb-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; margin: -6px 0 14px; font-size: 13px; }
-    .crumb { color: var(--text-muted); cursor: pointer; padding: 2px 5px; border-radius: 5px; transition: color 0.15s ease, background-color 0.15s ease; }
-    .crumb:hover { color: var(--text); background: var(--bg-elevated); }
-    .crumb.current { color: var(--accent-strong); font-weight: 700; cursor: default; }
-    .crumb.current:hover { background: none; }
-    .crumb-sep { color: var(--border); font-size: 12px; padding: 0 1px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+    .back-button:hover { background-color: #3949ab; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
     th {
-      text-align: left; padding: 10px 8px; background-color: var(--bg-elevated);
-      border-bottom: 1px solid var(--border); color: var(--text-muted);
-      font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;
+      text-align: left; padding: 8px; background-color: #2c2c2c;
+      border-bottom: 2px solid #3d3d3d; color: #9fa8da;
     }
-    th:first-child { border-top-left-radius: var(--radius-sm); }
-    th:last-child { border-top-right-radius: var(--radius-sm); }
-    td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 14px; }
-    tr:nth-child(even) { background-color: rgba(255,255,255,0.015); }
-    .loading { text-align: center; padding: 24px; color: var(--text-muted); }
+    td { padding: 8px; border-bottom: 1px solid #333; vertical-align: top; }
+    tr:nth-child(even) { background-color: #252525; }
+    .loading { text-align: center; padding: 20px; color: #9e9e9e; }
     .event-name { color: #bb86fc; font-style: italic; margin-top: 4px; display: block; }
-    .headliner-note { color: var(--teal); font-size: 0.9em; margin-top: 2px; display: block; }
-    .artist-role { color: var(--teal); font-size: 0.9em; font-style: italic; }
+    .headliner-note { color: #03dac6; font-size: 0.9em; margin-top: 2px; display: block; }
+    .artist-role { color: #03dac6; font-size: 0.9em; font-style: italic; }
     /* Drill-down styles */
     .link {
-      color: var(--teal); cursor: pointer; text-decoration: none; border-bottom: 1px dotted rgba(3,218,198,0.5);
-      transition: color 0.15s ease;
+      color: #03dac6; cursor: pointer; text-decoration: underline;
+      transition: color 0.2s;
     }
     .link:hover { color: #80cbc4; }
     tr.clickable { cursor: pointer; }
-    tr.clickable:hover td { background-color: var(--bg-elevated) !important; }
+    tr.clickable:hover td { background-color: #2a2a2a !important; }
     /* Header home button */
     .header-inner {
-      display: flex; align-items: center; justify-content: space-between; max-width: 900px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .header-inner h1 {
-      margin: 0; flex: 1; text-align: center; font-size: 22px; font-weight: 800; letter-spacing: 0.01em;
-    }
+    .header-inner h1 { margin: 0; flex: 1; text-align: center; }
     .home-btn {
-      background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.25);
-      padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600;
-      transition: background-color 0.15s ease; white-space: nowrap;
+      background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 12px; border-radius: 16px; cursor: pointer; font-size: 13px;
+      transition: background-color 0.2s; white-space: nowrap;
     }
-    .home-btn:hover { background: rgba(255,255,255,0.22); }
-    .home-btn-placeholder { width: 76px; }
-    /* Quick section-switch nav */
-    #quick-nav {
-      display: none; gap: 8px; overflow-x: auto; padding: 12px 2px 4px;
-      position: sticky; top: 0; background: var(--bg); z-index: 20; scrollbar-width: none;
-    }
-    #quick-nav::-webkit-scrollbar { display: none; }
-    .qn-pill {
-      flex: 0 0 auto; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
-      padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
-      white-space: nowrap; transition: all 0.15s ease;
-    }
-    .qn-pill:hover { color: var(--text); border-color: var(--accent); }
-    .qn-pill.active { background: var(--accent-soft); color: var(--accent-strong); border-color: var(--accent); }
-    /* Home screen */
-    .hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 10px; margin-bottom: 16px; }
-    .hero-stat {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 16px 12px; text-align: center;
-    }
-    .hero-stat-value { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.2; }
-    .hero-stat-label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
-    .home-lead { color: var(--text-muted); font-size: 13.5px; margin: 4px 4px 16px; text-align: center; }
-    .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px; }
-    .nav-tile {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 22px 16px; text-align: center; cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .nav-tile:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--shadow); }
-    .nav-tile-icon {
-      font-size: 26px; width: 54px; height: 54px; line-height: 54px; border-radius: 50%;
-      background: var(--accent-soft); margin: 0 auto 12px;
-    }
-    .nav-tile-title { font-weight: 700; font-size: 15px; }
-    .nav-tile-sub { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .home-btn:hover { background: rgba(255,255,255,0.25); }
+    .home-btn-placeholder { width: 70px; }
     /* A-Z filter */
     #az-filter {
       display: flex; flex-wrap: wrap; gap: 3px; padding: 8px 0 12px;
-      position: sticky; top: 52px; background: var(--bg); z-index: 10;
+      position: sticky; top: 0; background: #1e1e1e; z-index: 10;
     }
     .az-btn {
-      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 4px 5px;
-      border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; min-width: 26px; font-weight: 600;
-      transition: all 0.15s ease;
+      background: #3949ab; color: white; border: none; padding: 4px 5px;
+      border-radius: 4px; cursor: pointer; font-size: 12px; min-width: 26px;
+      transition: background-color 0.2s;
     }
-    .az-btn:hover { border-color: var(--accent); color: var(--text); }
-    .az-btn:disabled { background: transparent; color: #444; border-color: var(--border); cursor: default; }
+    .az-btn:hover { background: #5c6bc0; }
+    .az-btn:disabled { background: #2c2c2c; color: #555; cursor: default; }
     .letter-anchor {
-      padding: 4px 12px; font-weight: 700; color: var(--text-muted);
-      background: transparent; font-size: 0.78em; letter-spacing: 0.06em;
-      border-bottom: 1px solid var(--border); list-style: none;
+      padding: 3px 12px; font-weight: bold; color: #9fa8da;
+      background: #252525; font-size: 0.8em; border-bottom: 1px solid #303030;
+      list-style: none;
     }
     /* Upcoming status badge */
-    .status-upcoming { background: #00796b; color: white; padding: 2px 9px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
-    .status-announced { background: #e65100; color: white; padding: 2px 9px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+    .status-upcoming { background: #00796b; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
+    .status-announced { background: #e65100; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85em; }
     .days-today { color: #FF9E80; font-weight: bold; }
     .days-soon { color: #80DEEA; font-weight: bold; }
   </style>
@@ -178,44 +111,24 @@
   </div>
 
   <div class="container">
-    <div id="quick-nav">
-      <button class="qn-pill" data-target="upcoming" onclick="showUpcoming()">🎟️ Upcoming</button>
-      <button class="qn-pill" data-target="artists" onclick="showArtists()">👤 Artists</button>
-      <button class="qn-pill" data-target="analysis" onclick="showAnalysis()">📊 Analysis</button>
-      <button class="qn-pill" data-target="venues" onclick="showVenues()">🏟️ Venues</button>
-      <button class="qn-pill" data-target="years" onclick="showYears()">📅 Years</button>
-    </div>
-
     <!-- Home Screen -->
     <div id="home-screen">
-      <div id="home-stats" class="hero-stats"></div>
-      <div class="home-lead">Where to?</div>
-      <div class="nav-grid">
-        <div class="nav-tile" onclick="showUpcoming()">
-          <div class="nav-tile-icon">🎟️</div>
-          <div class="nav-tile-title">Upcoming</div>
-          <div class="nav-tile-sub">What's next</div>
-        </div>
-        <div class="nav-tile" onclick="showArtists()">
-          <div class="nav-tile-icon">👤</div>
-          <div class="nav-tile-title">Artists</div>
-          <div class="nav-tile-sub">Browse by artist</div>
-        </div>
-        <div class="nav-tile" onclick="showAnalysis()">
-          <div class="nav-tile-icon">📊</div>
-          <div class="nav-tile-title">Analysis</div>
-          <div class="nav-tile-sub">Stats &amp; trends</div>
-        </div>
-        <div class="nav-tile" onclick="showVenues()">
-          <div class="nav-tile-icon">🏟️</div>
-          <div class="nav-tile-title">Venues</div>
-          <div class="nav-tile-sub">Browse by venue</div>
-        </div>
-        <div class="nav-tile" onclick="showYears()">
-          <div class="nav-tile-icon">📅</div>
-          <div class="nav-tile-title">Years</div>
-          <div class="nav-tile-sub">Browse by year</div>
-        </div>
+      <div class="card">
+        <button class="button" onclick="showUpcoming()">
+          <span class="btn-icon">🎟️</span> Upcoming Concerts
+        </button>
+        <button class="button" onclick="showArtists()">
+          <span class="btn-icon">👤</span> Artist Breakdown
+        </button>
+        <button class="button" onclick="showAnalysis()">
+          <span class="btn-icon">📊</span> Concert Analysis
+        </button>
+        <button class="button" onclick="showVenues()">
+          <span class="btn-icon">🏟️</span> Venue Breakdown
+        </button>
+        <button class="button" onclick="showYears()">
+          <span class="btn-icon">📅</span> Yearly Breakdown
+        </button>
       </div>
     </div>
 
@@ -258,17 +171,16 @@
       <div id="upcoming-content" class="loading">Loading upcoming concerts...</div>
     </div>
 
-    <!-- Detail Screen — shared by artist, venue, city, event, companion, and year detail views -->
+    <!-- Detail Screen — shared by artist, venue, event, companion, and year detail views -->
     <div id="detail-screen" style="display:none">
       <button class="back-button" onclick="goBack()">← Back</button>
-      <div id="breadcrumb-bar" class="breadcrumb-bar"></div>
       <div id="detail-content"></div>
     </div>
   </div>
 
   <script>
     // Replace with your deployed Apps Script web app URL
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYhFazzd-SkzX4PHNyy0B1TrUXM8KdGSCyrdHJw-rflXJ7wggGX1zggScjORAaGmkm2Q/exec';
+    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
 
     const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
@@ -297,19 +209,8 @@
     // Stack-based navigation — supports arbitrary drill-down depth.
     // Each entry stores the screen name, rendered HTML (for detail levels),
     // and scroll position so the user returns to exactly where they were.
-    // breadcrumbTrail mirrors navStack 1:1 — breadcrumbTrail[i] is the label
-    // for the state stored at navStack[i], so jumping to either can be done
-    // by index (see jumpToBreadcrumb).
     let navStack = [];
-    let breadcrumbTrail = [];
-    let currentLabel = '';
     let currentScreen = 'home';
-    let topLevelScreen = null; // which quick-nav pill (if any) should read as active
-
-    const screenLabels = {
-      artists: 'Artists', venues: 'Venues', analysis: 'Analysis',
-      years: 'Years', upcoming: 'Upcoming'
-    };
 
     function showScreen(screenId) {
       ['home', 'artists', 'venues', 'analysis', 'detail', 'years', 'upcoming'].forEach(s => {
@@ -319,28 +220,10 @@
       currentScreen = screenId;
       window.scrollTo(0, 0);
       document.getElementById('home-btn').style.visibility = screenId === 'home' ? 'hidden' : 'visible';
-
-      if (screenId === 'home') topLevelScreen = null;
-      else if (screenId !== 'detail') topLevelScreen = screenId;
-
-      // Detail screens keep whatever breadcrumb state navigateToDetail/goBack/
-      // jumpToBreadcrumb already set up; every other screen is a fresh root.
-      if (screenId !== 'detail') {
-        breadcrumbTrail = [];
-        currentLabel = screenLabels[screenId] || '';
-      }
-      renderBreadcrumbs();
-
-      const quickNav = document.getElementById('quick-nav');
-      quickNav.style.display = screenId === 'home' ? 'none' : 'flex';
-      document.querySelectorAll('.qn-pill').forEach(p => {
-        p.classList.toggle('active', p.dataset.target === topLevelScreen);
-      });
     }
 
     // Navigate into a new detail view, preserving the current state on the stack.
-    function navigateToDetail(loadingHtml, label) {
-      const outgoingLabel = currentScreen === 'detail' ? currentLabel : (screenLabels[currentScreen] || '');
+    function navigateToDetail(loadingHtml) {
       navStack.push({
         screen: currentScreen,
         scroll: window.scrollY,
@@ -348,50 +231,18 @@
           ? document.getElementById('detail-content').innerHTML
           : null
       });
-      breadcrumbTrail.push(outgoingLabel);
-      currentLabel = label || '';
       document.getElementById('detail-content').innerHTML = loadingHtml;
       showScreen('detail');
-    }
-
-    function renderBreadcrumbs() {
-      const bar = document.getElementById('breadcrumb-bar');
-      if (!bar) return;
-      if (currentScreen !== 'detail' || breadcrumbTrail.length === 0) { bar.innerHTML = ''; return; }
-      const crumbs = breadcrumbTrail.map((label, i) =>
-        `<span class="crumb" onclick="jumpToBreadcrumb(${i})">${label}</span>`
-      );
-      crumbs.push(`<span class="crumb current">${currentLabel}</span>`);
-      bar.innerHTML = crumbs.join('<span class="crumb-sep">›</span>');
-    }
-
-    // Jump directly back to an earlier point in the drill-down trail,
-    // skipping however many "Back" presses that would otherwise take.
-    function jumpToBreadcrumb(index) {
-      const target = navStack[index];
-      if (!target) return;
-      currentLabel = breadcrumbTrail[index];
-      navStack = navStack.slice(0, index);
-      breadcrumbTrail = breadcrumbTrail.slice(0, index);
-      if (target.screen === 'detail' && target.detailHtml) {
-        document.getElementById('detail-content').innerHTML = target.detailHtml;
-        showScreen('detail');
-      } else {
-        showScreen(target.screen);
-      }
-      setTimeout(() => window.scrollTo(0, target.scroll), 50);
     }
 
     function showHome() {
       navStack = [];
       showScreen('home');
-      renderHomeStats();
     }
 
     function goBack() {
       if (navStack.length === 0) { showScreen('home'); return; }
       const prev = navStack.pop();
-      currentLabel = breadcrumbTrail.pop();
       if (prev.screen === 'detail' && prev.detailHtml) {
         document.getElementById('detail-content').innerHTML = prev.detailHtml;
         showScreen('detail');
@@ -450,12 +301,6 @@
       return `<span class="link" onclick="event.stopPropagation();loadYearDetail(${year})">${formatDate(dateStr)}</span>`;
     }
 
-    // Renders a city as a clickable link to that city's breakdown.
-    function cityLink(city) {
-      if (!city) return '-';
-      return `<span class="link" onclick="event.stopPropagation();loadCityDetail('${esc(city)}')">${city}</span>`;
-    }
-
     function scrollToLetter(letter) {
       const el = document.getElementById('az-' + letter);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -465,34 +310,6 @@
       return `<div class="card"><div class="section-header">ERROR</div><div style="color:#ff6b6b;padding:10px;">${msg}</div></div>`;
     }
 
-    // ── Home screen stats ──────────────────────────────────────────────────────
-
-    // Populates the hero stat tiles from already-cached data (no extra network
-    // cost — getAnalysis and getUpcomingShows are pre-warmed on page load).
-    function renderHomeStats() {
-      const el = document.getElementById('home-stats');
-      Promise.all([callApi('getAnalysis'), callApi('getUpcomingShows')])
-        .then(([analysis, upcoming]) => {
-          const tiles = [];
-          if (analysis && analysis.success) {
-            tiles.push({ value: analysis.summary.totalEvents, label: 'Shows Attended' });
-            tiles.push({ value: analysis.summary.uniqueArtists, label: 'Unique Artists' });
-            tiles.push({ value: analysis.summary.uniqueVenues, label: 'Venues' });
-          }
-          if (upcoming && upcoming.success) {
-            const next = upcoming.shows.find(s => s.status === 'Upcoming') || upcoming.shows[0];
-            tiles.push({
-              value: next ? (next.daysUntil === 0 ? 'Today' : `${next.daysUntil}d`) : '—',
-              label: next ? `Next: ${next.artist}` : 'No Shows Booked'
-            });
-          }
-          el.innerHTML = tiles.map(t =>
-            `<div class="hero-stat"><div class="hero-stat-value">${t.value}</div><div class="hero-stat-label">${t.label}</div></div>`
-          ).join('');
-        })
-        .catch(() => { el.innerHTML = ''; });
-    }
-
     // ── Top-level screens ─────────────────────────────────────────────────────
 
     function sortKey(name) {
@@ -500,7 +317,6 @@
     }
 
     function showArtists() {
-      navStack = [];
       showScreen('artists');
       document.getElementById('artists-content').innerHTML = '<div class="loading">Loading artists...</div>';
       callApi('getArtists')
@@ -546,7 +362,6 @@
     }
 
     function showVenues() {
-      navStack = [];
       showScreen('venues');
       document.getElementById('venues-content').innerHTML = '<div class="loading">Loading venues...</div>';
       callApi('getVenues')
@@ -567,7 +382,6 @@
     }
 
     function showAnalysis() {
-      navStack = [];
       showScreen('analysis');
       document.getElementById('analysis-content').innerHTML = '<div class="loading">Loading analysis...</div>';
       callApi('getAnalysis')
@@ -612,25 +426,20 @@
           if (topCities && topCities.length > 0) {
             html += '<div class="card"><div class="section-header">MOST VISITED CITIES</div><table><thead><tr><th>City</th><th>Events</th></tr></thead><tbody>';
             topCities.forEach(c => {
-              html += `<tr class="clickable" onclick="loadCityDetail('${esc(c.name)}')">
-                <td><span class="link">${c.name}</span></td><td>${c.count}</td></tr>`;
+              html += `<tr><td>${c.name}</td><td>${c.count}</td></tr>`;
             });
             html += '</tbody></table></div>';
           }
 
           if (eventsYearData && eventsYearData.length > 0) {
             html += '<div class="card"><div class="section-header">EVENTS BY YEAR</div><table><thead><tr><th>Year</th><th>Events</th></tr></thead><tbody>';
-            eventsYearData.forEach(y => {
-              html += `<tr class="clickable" onclick="loadYearDetail(${y.year})"><td><span class="link">${y.year}</span></td><td>${y.count}</td></tr>`;
-            });
+            eventsYearData.forEach(y => { html += `<tr><td>${y.year}</td><td>${y.count}</td></tr>`; });
             html += '</tbody></table></div>';
           }
 
           if (artistYearData && artistYearData.length > 0) {
             html += '<div class="card"><div class="section-header">UNIQUE ARTISTS BY YEAR</div><table><thead><tr><th>Year</th><th>Unique Artists</th></tr></thead><tbody>';
-            artistYearData.forEach(y => {
-              html += `<tr class="clickable" onclick="loadYearDetail(${y.year})"><td><span class="link">${y.year}</span></td><td>${y.count}</td></tr>`;
-            });
+            artistYearData.forEach(y => { html += `<tr><td>${y.year}</td><td>${y.count}</td></tr>`; });
             html += '</tbody></table></div>';
           }
 
@@ -654,7 +463,7 @@
     // ── Detail views ──────────────────────────────────────────────────────────
 
     function loadArtistDetail(artist) {
-      navigateToDetail(`<div class="card"><div class="section-header">ARTIST: ${artist}</div><div class="loading">Loading data...</div></div>`, artist);
+      navigateToDetail(`<div class="card"><div class="section-header">ARTIST: ${artist}</div><div class="loading">Loading data...</div></div>`);
 
       callApi('getArtistData', { artist })
         .then(data => {
@@ -718,7 +527,7 @@
             html += `<tr class="clickable" onclick="loadEventDetail('${c.date}','${esc(c.venue)}')">
               <td>${dateLink(c.date)}</td>
               <td>${venueCell}</td>
-              <td>${cityLink(c.city)}</td>
+              <td>${c.city}</td>
               <td>${ratingBadge(c.rating)}</td>
             </tr>`;
           });
@@ -736,10 +545,7 @@
 
           if (sortedCities.length > 0) {
             html += '<div class="card"><div class="section-header">CITIES</div><table><thead><tr><th>City</th><th>Times</th></tr></thead><tbody>';
-            sortedCities.forEach(([name, count]) => {
-              html += `<tr class="clickable" onclick="loadCityDetail('${esc(name)}')">
-                <td><span class="link">${name}</span></td><td>${count}</td></tr>`;
-            });
+            sortedCities.forEach(([name, count]) => { html += `<tr><td>${name}</td><td>${count}</td></tr>`; });
             html += '</tbody></table></div>';
           }
 
@@ -761,7 +567,7 @@
     }
 
     function loadVenueDetail(venue) {
-      navigateToDetail(`<div class="card"><div class="section-header">VENUE: ${venue}</div><div class="loading">Loading data...</div></div>`, venue);
+      navigateToDetail(`<div class="card"><div class="section-header">VENUE: ${venue}</div><div class="loading">Loading data...</div></div>`);
 
       callApi('getVenueData', { venue })
         .then(data => {
@@ -777,7 +583,7 @@
               <div class="stats-label">Total Events:</div><div class="stats-value">${summary.totalEvents}</div>
               <div class="stats-label">Total Artists:</div><div class="stats-value">${summary.totalArtists}</div>
               <div class="stats-label">Unique Artists:</div><div class="stats-value">${summary.uniqueArtists}</div>
-              <div class="stats-label">City:</div><div class="stats-value">${cityLink(summary.city)}</div>
+              <div class="stats-label">City:</div><div class="stats-value">${summary.city}</div>
               <div class="stats-label">First Visit:</div><div class="stats-value">${formatDate(summary.firstVisit)}</div>
               <div class="stats-label">Latest Visit:</div><div class="stats-value">${formatDate(summary.lastVisit)}</div>
               <div class="stats-label">Time Span:</div><div class="stats-value">${summary.timeSpan}</div>
@@ -846,87 +652,8 @@
         });
     }
 
-    function loadCityDetail(city) {
-      navigateToDetail(`<div class="card"><div class="section-header">CITY: ${city}</div><div class="loading">Loading data...</div></div>`, city);
-
-      callApi('getCityData', { city })
-        .then(data => {
-          if (!data.success) {
-            document.getElementById('detail-content').innerHTML = errHtml('No data found');
-            return;
-          }
-          const { summary, events, topArtists, topVenues } = data;
-
-          let html = `<div class="card">
-            <div class="section-header">CITY: ${city}</div>
-            <div class="stats-grid">
-              <div class="stats-label">Total Events:</div><div class="stats-value">${summary.totalEvents}</div>
-              <div class="stats-label">Total Artists:</div><div class="stats-value">${summary.totalArtists}</div>
-              <div class="stats-label">Unique Artists:</div><div class="stats-value">${summary.uniqueArtists}</div>
-              <div class="stats-label">Unique Venues:</div><div class="stats-value">${summary.uniqueVenues}</div>
-              <div class="stats-label">First Visit:</div><div class="stats-value">${formatDate(summary.firstVisit)}</div>
-              <div class="stats-label">Latest Visit:</div><div class="stats-value">${formatDate(summary.lastVisit)}</div>
-              <div class="stats-label">Time Span:</div><div class="stats-value">${summary.timeSpan}</div>
-              <div class="stats-label">Average Rating:</div>
-              <div class="stats-value">${ratingBadge(summary.avgRating)}</div>
-            </div>
-          </div>`;
-
-          // Event history — row → event detail, venue/artist names → their own detail
-          if (events && events.length > 0) {
-            html += '<div class="card"><div class="section-header">EVENT HISTORY</div><table><thead><tr><th>Date</th><th>Venue &amp; Artists</th><th>Companions</th><th>Rating</th></tr></thead><tbody>';
-            events.forEach(ev => {
-              const venueLink = `<span class="link" onclick="event.stopPropagation();loadVenueDetail('${esc(ev.venue)}')">${ev.venue}</span>`;
-              const headliners = [], supportActs = [], otherActs = [];
-              (ev.artists || []).forEach(a => {
-                const r = (a.role || '').toLowerCase();
-                const nameLink = `<span class="link" onclick="event.stopPropagation();loadArtistDetail('${esc(a.name)}')">${a.name}</span>`;
-                if (r.includes('headline') || r.includes('headliner')) headliners.push(nameLink);
-                else if (r.includes('support') || r.includes('opening')) supportActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`);
-                else a.role ? otherActs.push(`${nameLink} <span class="artist-role">(${a.role})</span>`) : headliners.push(nameLink);
-              });
-              let artistDisplay = headliners.join(' &amp; ');
-              if (otherActs.length) artistDisplay += (artistDisplay ? '<br>' : '') + otherActs.join('<br>');
-              if (ev.eventName && ev.eventName.trim()) artistDisplay += `${artistDisplay ? '<br>' : ''}<span class="event-name">${ev.eventName}</span>`;
-              if (supportActs.length) artistDisplay += (artistDisplay ? '<br>' : '') + supportActs.join('<br>');
-              let cell = venueLink;
-              if (artistDisplay) cell += '<br>' + artistDisplay;
-              html += `<tr class="clickable" onclick="loadEventDetail('${ev.date}','${esc(ev.venue)}')">
-                <td>${dateLink(ev.date)}</td>
-                <td>${cell}</td>
-                <td>${companionLinks(ev.companions)}</td>
-                <td>${ratingBadge(ev.rating)}</td>
-              </tr>`;
-            });
-            html += '</tbody></table></div>';
-          }
-
-          if (topArtists && topArtists.length > 0) {
-            html += '<div class="card"><div class="section-header">TOP ARTISTS IN THIS CITY</div><table><thead><tr><th>Artist</th><th>Times Seen</th></tr></thead><tbody>';
-            topArtists.forEach(a => {
-              html += `<tr class="clickable" onclick="loadArtistDetail('${esc(a.name)}')"><td><span class="link">${a.name}</span></td><td>${a.count}</td></tr>`;
-            });
-            html += '</tbody></table></div>';
-          }
-
-          if (topVenues && topVenues.length > 0) {
-            html += '<div class="card"><div class="section-header">VENUES IN THIS CITY</div><table><thead><tr><th>Venue</th><th>Events</th></tr></thead><tbody>';
-            topVenues.forEach(v => {
-              html += `<tr class="clickable" onclick="loadVenueDetail('${esc(v.name)}')"><td><span class="link">${v.name}</span></td><td>${v.count}</td></tr>`;
-            });
-            html += '</tbody></table></div>';
-          }
-
-          html += `<div style="text-align:center;color:#9e9e9e;font-size:12px;margin-top:16px;margin-bottom:32px;">Generated: ${new Date().toLocaleString()}</div>`;
-          document.getElementById('detail-content').innerHTML = html;
-        })
-        .catch(e => {
-          document.getElementById('detail-content').innerHTML = errHtml(e);
-        });
-    }
-
     function loadEventDetail(dateStr, venue) {
-      navigateToDetail(`<div class="card"><div class="section-header">EVENT DETAIL</div><div class="loading">Loading data...</div></div>`, formatDate(dateStr));
+      navigateToDetail(`<div class="card"><div class="section-header">EVENT DETAIL</div><div class="loading">Loading data...</div></div>`);
 
       callApi('getEventData', { date: dateStr, venue })
         .then(data => {
@@ -941,7 +668,7 @@
               <div class="stats-label">Date:</div><div class="stats-value">${dateLink(data.date)}</div>
               <div class="stats-label">Venue:</div>
               <div class="stats-value"><span class="link" onclick="loadVenueDetail('${esc(data.venue)}')">${data.venue}</span></div>
-              <div class="stats-label">City:</div><div class="stats-value">${cityLink(data.city)}</div>`;
+              <div class="stats-label">City:</div><div class="stats-value">${data.city}</div>`;
           if (data.eventName) {
             html += `<div class="stats-label">Event:</div><div class="stats-value" style="color:#bb86fc;font-style:italic;">${data.eventName}</div>`;
           }
@@ -979,7 +706,6 @@
     }
 
     function showYears() {
-      navStack = [];
       showScreen('years');
       document.getElementById('years-content').innerHTML = '<div class="loading">Loading years...</div>';
       callApi('getYears')
@@ -1003,7 +729,7 @@
     }
 
     function loadYearDetail(year) {
-      navigateToDetail(`<div class="card"><div class="section-header">YEAR: ${year}</div><div class="loading">Loading data...</div></div>`, String(year));
+      navigateToDetail(`<div class="card"><div class="section-header">YEAR: ${year}</div><div class="loading">Loading data...</div></div>`);
       callApi('getYearData', { year })
         .then(data => {
           if (!data.success) {
@@ -1158,7 +884,6 @@
     }
 
     function showUpcoming() {
-      navStack = [];
       showScreen('upcoming');
       showingAnnounced = false;
       document.getElementById('upcoming-content').innerHTML = '<div class="loading">Loading upcoming concerts...</div>';
@@ -1177,7 +902,7 @@
     }
 
     function loadCompanionDetail(companion) {
-      navigateToDetail(`<div class="card"><div class="section-header">COMPANION: ${companion}</div><div class="loading">Loading data...</div></div>`, companion);
+      navigateToDetail(`<div class="card"><div class="section-header">COMPANION: ${companion}</div><div class="loading">Loading data...</div></div>`);
 
       callApi('getCompanionData', { companion })
         .then(data => {
@@ -1268,9 +993,7 @@
       callApi('getAnalysis'),
       callApi('getYears'),
       callApi('getUpcomingShows')
-    ]).then(() => renderHomeStats());
-
-    renderHomeStats();
+    ]);
   </script>
 </body>
 </html>
