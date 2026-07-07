@@ -11,13 +11,18 @@ function onEdit(e) {
     return;
   }
   
+  // Any edit to the Tracker sheet can change data the web app has already
+  // cached (venue/artist corrections, rating tweaks, etc.) — bust the
+  // server-side cache immediately rather than waiting for the 1-hour TTL.
+  incrementCacheGeneration();
+
   // Check if the edit was in the Status column and is set to "Attended"
   const sheet = e.range.getSheet();
   const data = sheet.getDataRange().getValues();
   const headers = data[0];
   const statusCol = headers.indexOf("Status");
-  
-  // If not editing the Status column, exit
+
+  // If not editing the Status column, exit before the heavier dashboard updates below
   if (statusCol === -1 || e.range.getColumn() !== statusCol + 1) {
     return;
   }
@@ -71,9 +76,6 @@ function onEdit(e) {
           }
         }
       }
-
-      // Bust the server-side cache so the next web app request reflects the new data
-      incrementCacheGeneration();
 
       SpreadsheetApp.getActiveSpreadsheet().toast("Analysis dashboards updated automatically", "Auto Update");
     } catch (error) {
